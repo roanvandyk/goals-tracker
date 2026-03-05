@@ -14,7 +14,18 @@
   <main id="authPage" class="auth-page">
     <div class="auth-card">
       <h1>2026 Goals Tracker</h1>
-      <div id="authSignIn" class="auth-panel">
+      <div id="signup" class="auth-panel">
+        <div class="sub">Create an account</div>
+        <form id="signUpForm" class="auth-form">
+          <input id="signUpEmail" type="email" placeholder="Email" autocomplete="email" />
+          <input id="signUpPassword" type="password" placeholder="Password (min 6 chars)" autocomplete="new-password" />
+          <button type="submit" class="mini">Create account</button>
+        </form>
+        <div class="muted">After creating an account, you may need to confirm your email.</div>
+        <a href="#signin" class="mini btn-secondary">Back to sign in</a>
+      </div>
+
+      <div id="signin" class="auth-panel">
         <div class="sub">Sign in to your account</div>
         <form id="signInForm" class="auth-form">
           <input id="signInEmail" type="email" placeholder="Email" autocomplete="email" />
@@ -27,18 +38,7 @@
         <div id="authRequired" class="muted" style="display:none;">
           Please sign in to view and edit goals.
         </div>
-        <button id="showSignUp" type="button" class="mini btn-secondary">Create a new account</button>
-      </div>
-
-      <div id="authSignUp" class="auth-panel" style="display:none;">
-        <div class="sub">Create an account</div>
-        <form id="signUpForm" class="auth-form">
-          <input id="signUpEmail" type="email" placeholder="Email" autocomplete="email" />
-          <input id="signUpPassword" type="password" placeholder="Password (min 6 chars)" autocomplete="new-password" />
-          <button type="submit" class="mini">Create account</button>
-        </form>
-        <div class="muted">After creating an account, you may need to confirm your email.</div>
-        <button id="showSignIn" type="button" class="mini btn-secondary">Back to sign in</button>
+        <a href="#signup" class="mini btn-secondary">Create a new account</a>
       </div>
     </div>
   </main>

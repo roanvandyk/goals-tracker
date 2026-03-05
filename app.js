@@ -85,16 +85,12 @@ const signInEmailEl = $("#signInEmail");
 const signInPasswordEl = $("#signInPassword");
 const signUpEmailEl = $("#signUpEmail");
 const signUpPasswordEl = $("#signUpPassword");
-const showSignUpBtn = $("#showSignUp");
-const showSignInBtn = $("#showSignIn");
 const signOutBtn = $("#signOutBtn");
 const authStatusEl = $("#authStatus");
 const authStatusAppEl = $("#authStatusApp");
 const authRequiredEl = $("#authRequired");
 const authPageEl = $("#authPage");
 const appPageEl = $("#appPage");
-const authSignInEl = $("#authSignIn");
-const authSignUpEl = $("#authSignUp");
 
 // ==============================
 // Utilities
@@ -359,17 +355,6 @@ function setAuthUI(user) {
   authRequiredEl.style.display = signedIn ? "none" : "block";
 }
 
-function showSignUp() {
-  if (!authSignInEl || !authSignUpEl) return;
-  authSignInEl.style.display = "none";
-  authSignUpEl.style.display = "grid";
-}
-
-function showSignIn() {
-  if (!authSignInEl || !authSignUpEl) return;
-  authSignUpEl.style.display = "none";
-  authSignInEl.style.display = "grid";
-}
 
 async function loadAndRender() {
   goals = await fetchGoals();
@@ -866,11 +851,7 @@ function wireEvents() {
     }
 
     alert("Account created. Please check your email to confirm, then sign in.");
-    showSignIn();
   });
-
-  if (showSignUpBtn) showSignUpBtn.addEventListener("click", showSignUp);
-  if (showSignInBtn) showSignInBtn.addEventListener("click", showSignIn);
 
   signOutBtn.addEventListener("click", async () => {
     if (!ensureSupabase()) return;

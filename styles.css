@@ -84,8 +84,17 @@
       gap: 10px;
     }
     .auth-panel{
-      display: grid;
+      display: none;
       gap: 12px;
+    }
+    #signin{
+      display: grid;
+    }
+    #signup:target{
+      display: grid;
+    }
+    #signup:target + #signin{
+      display: none;
     }
     .auth-panel .mini.btn-secondary{
       width: 100%;
