@@ -31,19 +31,30 @@
       color: var(--muted);
       font-size: 14px;
     }
-    .auth{
-      margin-top: 12px;
+    .auth-page{
+      min-height: 100vh;
       display: grid;
-      gap: 8px;
+      place-items: center;
+      padding: 24px 18px;
+    }
+    .auth-card{
+      width: min(520px, 100%);
+      background: rgba(18,24,38,.92);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      display: grid;
+      gap: 10px;
+    }
+    .auth-card h1{
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: .2px;
     }
     .auth-form{
       display: grid;
-      grid-template-columns: 1fr 1fr auto auto;
-      gap: 8px;
-      align-items: center;
-    }
-    @media (max-width: 900px){
-      .auth-form{ grid-template-columns: 1fr; }
+      gap: 10px;
     }
     .wrap{
       max-width: 1100px;

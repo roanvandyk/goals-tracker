@@ -86,7 +86,10 @@ const signInBtn = $("#signInBtn");
 const signUpBtn = $("#signUpBtn");
 const signOutBtn = $("#signOutBtn");
 const authStatusEl = $("#authStatus");
+const authStatusAppEl = $("#authStatusApp");
 const authRequiredEl = $("#authRequired");
+const authPageEl = $("#authPage");
+const appPageEl = $("#appPage");
 
 // ==============================
 // Utilities
@@ -325,13 +328,13 @@ function showToast(message, { actionText, onAction, durationMs = 8000 } = {}) {
 
 function setAuthUI(user) {
   const signedIn = !!user;
-  authForm.style.display = signedIn ? "none" : "grid";
+  if (authPageEl) authPageEl.style.display = signedIn ? "none" : "grid";
+  if (appPageEl) appPageEl.style.display = signedIn ? "block" : "none";
+
   signOutBtn.style.display = signedIn ? "inline-flex" : "none";
   authStatusEl.textContent = signedIn ? `Signed in as ${user.email}` : "Not signed in.";
+  if (authStatusAppEl) authStatusAppEl.textContent = signedIn ? `Signed in as ${user.email}` : "";
   authRequiredEl.style.display = signedIn ? "none" : "block";
-
-  const wrap = document.querySelector(".wrap");
-  if (wrap) wrap.style.display = signedIn ? "grid" : "none";
 }
 
 async function loadAndRender() {
