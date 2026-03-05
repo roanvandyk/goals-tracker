@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>2026 Goals Tracker</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="./styles.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="./app.js"></script>
@@ -13,18 +14,31 @@
   <main id="authPage" class="auth-page">
     <div class="auth-card">
       <h1>2026 Goals Tracker</h1>
-      <div class="sub">Sign in to sync your goals across devices.</div>
-      <form id="authForm" class="auth-form">
-        <input id="authEmail" type="email" placeholder="Email" autocomplete="email" />
-        <input id="authPassword" type="password" placeholder="Password" autocomplete="current-password" />
-        <button id="signInBtn" type="submit" class="mini">Sign in</button>
-        <button id="signUpBtn" type="button" class="mini btn-secondary">Sign up</button>
-      </form>
-      <div class="row">
-        <div id="authStatus" class="muted"></div>
+      <div id="authSignIn" class="auth-panel">
+        <div class="sub">Sign in to your account</div>
+        <form id="signInForm" class="auth-form">
+          <input id="signInEmail" type="email" placeholder="Email" autocomplete="email" />
+          <input id="signInPassword" type="password" placeholder="Password" autocomplete="current-password" />
+          <button type="submit" class="mini">Sign in</button>
+        </form>
+        <div class="row">
+          <div id="authStatus" class="muted"></div>
+        </div>
+        <div id="authRequired" class="muted" style="display:none;">
+          Please sign in to view and edit goals.
+        </div>
+        <button id="showSignUp" type="button" class="mini btn-secondary">Create a new account</button>
       </div>
-      <div id="authRequired" class="muted" style="display:none;">
-        Please sign in to view and edit goals.
+
+      <div id="authSignUp" class="auth-panel" style="display:none;">
+        <div class="sub">Create an account</div>
+        <form id="signUpForm" class="auth-form">
+          <input id="signUpEmail" type="email" placeholder="Email" autocomplete="email" />
+          <input id="signUpPassword" type="password" placeholder="Password (min 6 chars)" autocomplete="new-password" />
+          <button type="submit" class="mini">Create account</button>
+        </form>
+        <div class="muted">After creating an account, you may need to confirm your email.</div>
+        <button id="showSignIn" type="button" class="mini btn-secondary">Back to sign in</button>
       </div>
     </div>
   </main>

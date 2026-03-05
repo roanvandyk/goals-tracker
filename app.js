@@ -5,7 +5,7 @@
 const SUPABASE_URL = "https://xaufdruiponnyncjmjew.supabase.co";
 const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhhdWZkcnVpcG9ubnluY2ptamV3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NDA3MDcsImV4cCI6MjA4ODMxNjcwN30.JzhQqbSy3V6r1uSXk9r43vsAsO0ycCGjGhrimlY_zyw";
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let supabase = null;
 
 /** Goal schema
  * {
@@ -79,17 +79,22 @@ const resetBtn = $("#resetBtn");
 const exportBtn = $("#exportBtn");
 const importBtn = $("#importBtn");
 const toastEl = $("#toast");
-const authForm = $("#authForm");
-const authEmailEl = $("#authEmail");
-const authPasswordEl = $("#authPassword");
-const signInBtn = $("#signInBtn");
-const signUpBtn = $("#signUpBtn");
+const signInForm = $("#signInForm");
+const signUpForm = $("#signUpForm");
+const signInEmailEl = $("#signInEmail");
+const signInPasswordEl = $("#signInPassword");
+const signUpEmailEl = $("#signUpEmail");
+const signUpPasswordEl = $("#signUpPassword");
+const showSignUpBtn = $("#showSignUp");
+const showSignInBtn = $("#showSignIn");
 const signOutBtn = $("#signOutBtn");
 const authStatusEl = $("#authStatus");
 const authStatusAppEl = $("#authStatusApp");
 const authRequiredEl = $("#authRequired");
 const authPageEl = $("#authPage");
 const appPageEl = $("#appPage");
+const authSignInEl = $("#authSignIn");
+const authSignUpEl = $("#authSignUp");
 
 // ==============================
 // Utilities
@@ -245,6 +250,7 @@ let currentUser = null;
 // ==============================
 
 async function fetchGoals() {
+  if (!ensureSupabase()) return [];
   if (!currentUser) return [];
   const { data, error } = await supabase
     .from("goals")
@@ -261,18 +267,21 @@ async function fetchGoals() {
 }
 
 async function insertGoal(goal) {
+  if (!ensureSupabase()) throw new Error("Auth unavailable");
   const { data, error } = await supabase.from("goals").insert(goal).select().single();
   if (error) throw new Error(error.message);
   return data;
 }
 
 async function updateGoalRemote(id, payload) {
+  if (!ensureSupabase()) throw new Error("Auth unavailable");
   const { data, error } = await supabase.from("goals").update(payload).eq("id", id).select().single();
   if (error) throw new Error(error.message);
   return data;
 }
 
 async function deleteGoalRemote(id) {
+  if (!ensureSupabase()) throw new Error("Auth unavailable");
   const { error } = await supabase.from("goals").delete().eq("id", id);
   if (error) throw new Error(error.message);
 }
@@ -326,6 +335,19 @@ function showToast(message, { actionText, onAction, durationMs = 8000 } = {}) {
 // Auth
 // ==============================
 
+function ensureSupabase() {
+  if (supabase) return true;
+  if (window.supabase && typeof window.supabase.createClient === "function") {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    return true;
+  }
+  if (authStatusEl) {
+    authStatusEl.textContent = "Auth unavailable. Please disable Brave Shields for this site.";
+  }
+  alert("Supabase client failed to load. Please disable Brave Shields for this site.");
+  return false;
+}
+
 function setAuthUI(user) {
   const signedIn = !!user;
   if (authPageEl) authPageEl.style.display = signedIn ? "none" : "grid";
@@ -335,6 +357,18 @@ function setAuthUI(user) {
   authStatusEl.textContent = signedIn ? `Signed in as ${user.email}` : "Not signed in.";
   if (authStatusAppEl) authStatusAppEl.textContent = signedIn ? `Signed in as ${user.email}` : "";
   authRequiredEl.style.display = signedIn ? "none" : "block";
+}
+
+function showSignUp() {
+  if (!authSignInEl || !authSignUpEl) return;
+  authSignInEl.style.display = "none";
+  authSignUpEl.style.display = "grid";
+}
+
+function showSignIn() {
+  if (!authSignInEl || !authSignUpEl) return;
+  authSignUpEl.style.display = "none";
+  authSignInEl.style.display = "grid";
 }
 
 async function loadAndRender() {
@@ -356,6 +390,7 @@ async function loadAndRender() {
 }
 
 async function initAuth() {
+  if (!ensureSupabase()) return;
   const { data } = await supabase.auth.getSession();
   currentUser = data.session?.user ?? null;
   setAuthUI(currentUser);
@@ -800,24 +835,25 @@ async function deleteGoal(id) {
 function wireEvents() {
   addBtn.addEventListener("click", addGoal);
 
-  authForm.addEventListener("submit", async (e) => {
+  if (signInForm) signInForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const email = authEmailEl.value.trim();
-    const password = authPasswordEl.value;
+    if (!ensureSupabase()) return;
+    const email = signInEmailEl.value.trim();
+    const password = signInPasswordEl.value;
     if (!email || !password) {
       alert("Please enter an email and password.");
       return;
     }
 
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      alert(`Sign in failed: ${error.message}`);
-    }
+    if (error) alert(`Sign in failed: ${error.message}`);
   });
 
-  signUpBtn.addEventListener("click", async () => {
-    const email = authEmailEl.value.trim();
-    const password = authPasswordEl.value;
+  if (signUpForm) signUpForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!ensureSupabase()) return;
+    const email = signUpEmailEl.value.trim();
+    const password = signUpPasswordEl.value;
     if (!email || !password) {
       alert("Please enter an email and password.");
       return;
@@ -829,10 +865,15 @@ function wireEvents() {
       return;
     }
 
-    alert("Sign up successful. Please check your email to confirm your account.");
+    alert("Account created. Please check your email to confirm, then sign in.");
+    showSignIn();
   });
 
+  if (showSignUpBtn) showSignUpBtn.addEventListener("click", showSignUp);
+  if (showSignInBtn) showSignInBtn.addEventListener("click", showSignIn);
+
   signOutBtn.addEventListener("click", async () => {
+    if (!ensureSupabase()) return;
     const { error } = await supabase.auth.signOut();
     if (error) alert(`Sign out failed: ${error.message}`);
   });
