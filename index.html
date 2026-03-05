@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>2026 Goals Tracker</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="./app.js"></script>
+
+</head>
+<body>
+  <header>
+    <h1>2026 Goals Tracker</h1>
+    <div class="sub">Simple and fast. Data syncs to your account.</div>
+    <div class="auth">
+      <form id="authForm" class="auth-form">
+        <input id="authEmail" type="email" placeholder="Email" autocomplete="email" />
+        <input id="authPassword" type="password" placeholder="Password" autocomplete="current-password" />
+        <button id="signInBtn" type="submit" class="mini">Sign in</button>
+        <button id="signUpBtn" type="button" class="mini btn-secondary">Sign up</button>
+      </form>
+      <div class="row">
+        <div id="authStatus" class="muted"></div>
+        <button id="signOutBtn" class="mini btn-secondary" style="display:none;">Sign out</button>
+      </div>
+      <div id="authRequired" class="muted" style="display:none;">
+        Please sign in to view and edit goals.
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <!-- LEFT: Add / Manage -->
+    <section class="card">
+      <h2>Add a goal</h2>
+      <div class="body">
+        <div style="display:flex; gap:8px; margin-bottom:10px;">
+          <span class="pill">✅ once</span>
+          <span class="pill">🔢 count</span>
+          <span class="pill">📅 deadline</span>
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <label for="title">Goal</label>
+          <input id="title" placeholder="e.g., Read 5 books (no audiobooks)" />
+        </div>
+
+        <div class="row" style="margin-bottom:10px;">
+          <div>
+            <label for="type">Type</label>
+            <select id="type">
+              <option value="once">Once (checkbox)</option>
+              <option value="count">Count (progress to target)</option>
+              <option value="deadline">Deadline (checkbox + due date)</option>
+            </select>
+          </div>
+          <div>
+            <label for="category">Category</label>
+            <select id="category">
+              <option value="Outdoors">Outdoors</option>
+              <option value="Fitness">Fitness</option>
+              <option value="Cybersecurity">Cybersecurity</option>
+              <option value="Career">Career</option>
+              <option value="Relationships">Relationships</option>
+              <option value="Maker">Maker</option>
+              <option value="Life Admin">Life Admin</option>
+              <option value="Coding">Coding</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row" style="margin-bottom:10px;">
+          <div>
+            <label for="target">Target (for Count)</label>
+            <input id="target" type="number" min="1" placeholder="e.g., 150" />
+          </div>
+          <div>
+            <label for="due">Due date (for Deadline)</label>
+            <input id="due" type="date" />
+          </div>
+        </div>
+
+        <button id="addBtn">Add goal</button>
+
+        <hr style="border:0; border-top:1px solid var(--border); margin:14px 0;">
+
+        <div class="row">
+          <button id="exportBtn" class="btn-secondary mini">Export JSON</button>
+          <button id="importBtn" class="btn-secondary mini">Import JSON</button>
+        </div>
+        <div class="muted" style="margin-top:8px;">
+          Export lets you back up your goals. Import restores them (replaces current).
+        </div>
+
+        <hr style="border:0; border-top:1px solid var(--border); margin:14px 0;">
+
+        <button id="resetBtn" class="btn-danger mini">Reset everything</button>
+      </div>
+    </section>
+
+    <!-- RIGHT: Goals -->
+    <section class="card">
+      <h2>Your goals</h2>
+
+      <div class="filters">
+        <div class="chip active" data-filter="all">All</div>
+        <div class="chip" data-filter="active">Active</div>
+        <div class="chip" data-filter="done">Done</div>
+        <div class="chip" data-filter="deadline">Deadlines</div>
+        <div class="chip" data-filter="Cybersecurity">Cybersecurity</div>
+        <div class="chip" data-filter="Career">Career</div>
+        <div class="chip" data-filter="Fitness">Fitness</div>
+        <div class="chip" data-filter="Outdoors">Outdoors</div>
+      </div>
+
+      <div class="body">
+        <div id="stats" class="stats"></div>
+      </div>
+
+      <div id="list" class="list"></div>
+    </section>
+  </div>
+
+
+<div id="toast" style="display:none;"></div>
+</body>
+</html>
