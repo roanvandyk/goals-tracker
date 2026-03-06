@@ -110,6 +110,11 @@ function uid() {
   return Math.random().toString(16).slice(2) + "-" + Date.now().toString(16);
 }
 
+function isValidUuid(value) {
+  return typeof value === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
+
 function todayISODate() {
   const d = new Date();
   const yyyy = d.getFullYear();
@@ -200,7 +205,8 @@ function normalizeImportedGoal(raw) {
 
   const category = String(raw.category || "Other").trim() || "Other";
 
-  const id = typeof raw.id === "string" && raw.id.trim() ? raw.id.trim() : uid();
+  const idRaw = typeof raw.id === "string" ? raw.id.trim() : "";
+  const id = isValidUuid(idRaw) ? idRaw : null;
 
   const createdAtRaw = raw.created_at || raw.createdAt;
   const created_at =
@@ -265,7 +271,9 @@ async function fetchGoals() {
 
 async function insertGoal(goal) {
   if (!ensureSupabase()) throw new Error("Auth unavailable");
-  const { data, error } = await supabase.from("goals").insert(goal).select().single();
+  const payload = { ...goal };
+  if (!isValidUuid(payload.id)) delete payload.id;
+  const { data, error } = await supabase.from("goals").insert(payload).select().single();
   if (error) throw new Error(error.message);
   return data;
 }
@@ -360,7 +368,7 @@ function setAuthUI(user) {
 async function loadAndRender() {
   goals = await fetchGoals();
   if (goals.length === 0 && currentUser) {
-    const seeded = DEFAULT_GOALS.map(hydrateDefaultGoal).map((g) => ({
+    const seeded = DEFAULT_GOALS.map(hydrateDefaultGoal).map(({ id, ...g }) => ({
       ...g,
       user_id: currentUser.id
     }));
@@ -723,7 +731,6 @@ async function addGoal() {
   }
 
   const g = {
-    id: uid(),
     title,
     type,
     category,
@@ -985,6 +992,7 @@ function wireEvents() {
         // Deduplicate by id (first one wins)
         const seen = new Set();
         const deduped = normalized.filter((g) => {
+          if (!g.id) return true;
           if (seen.has(g.id)) return false;
           seen.add(g.id);
           return true;
@@ -993,10 +1001,11 @@ function wireEvents() {
         if (!currentUser) throw new Error("Not signed in");
 
         await supabase.from("goals").delete().eq("user_id", currentUser.id);
-        const rows = deduped.map((g) => ({
-          ...g,
-          user_id: currentUser.id
-        }));
+        const rows = deduped.map((g) => {
+          const row = { ...g, user_id: currentUser.id };
+          if (!isValidUuid(row.id)) delete row.id;
+          return row;
+        });
         const { data, error } = await supabase.from("goals").insert(rows).select();
         if (error) throw new Error(error.message);
 
